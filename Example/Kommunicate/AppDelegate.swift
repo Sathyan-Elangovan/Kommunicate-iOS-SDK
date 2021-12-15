@@ -9,6 +9,7 @@
 import UIKit
 import UserNotifications
 import Kommunicate
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -19,7 +20,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var appId = ""
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
+      
+        // Use Firebase library to configure APIs
+//        FirebaseApp.configure()
+        
         setUpNavigationBarAppearance()
 
         UNUserNotificationCenter.current().delegate = self

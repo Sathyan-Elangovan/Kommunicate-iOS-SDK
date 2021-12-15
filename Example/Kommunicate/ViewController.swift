@@ -9,6 +9,7 @@
 #if os(iOS)
 import UIKit
 import Kommunicate
+//import Firebase
 
 class ViewController: UIViewController {
 
@@ -25,6 +26,15 @@ class ViewController: UIViewController {
     @IBAction func launchConversation(_ sender: Any) {
         activityIndicator.startAnimating()
         view.isUserInteractionEnabled = false
+        
+        Messaging.messaging().token { token, error in
+          if let error = error {
+            print("Error fetching FCM registration token: \(error)")
+          } else if let token = token {
+            print("FCM registration token: \(token)")
+            self.fcmRegTokenMessage.text  = "Remote FCM registration token: \(token)"
+          }
+        }
 
         Kommunicate.createAndShowConversation(from: self, completion: {
             error in

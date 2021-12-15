@@ -13,6 +13,8 @@ target 'Kommunicate_Example' do
     pod 'Nimble'
     pod 'Quick'
     pod 'Nimble-Snapshots'
+    pod 'Firebase/Analytics'
+    pod 'Firebase/Messaging'
   end
 end
 target 'Kommunicate_ExampleUITests' do
