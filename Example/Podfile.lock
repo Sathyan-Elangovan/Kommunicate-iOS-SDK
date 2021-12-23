@@ -134,6 +134,7 @@ DEPENDENCIES:
   - ApplozicSwift
   - FBSnapshotTestCase (~> 2.1.4)
   - Firebase/Analytics
+  - Firebase/Core
   - Firebase/Messaging
   - Kommunicate (from `../`)
   - Nimble
@@ -190,6 +191,6 @@ SPEC CHECKSUMS:
   Quick: 6473349e43b9271a8d43839d9ba1c442ed1b7ac4
   SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
 
-PODFILE CHECKSUM: 6e43dfaa124e36a97edd28aa118d733b08a24a3d
+PODFILE CHECKSUM: 9a7f8731343745edbd47df2d97d0082dfb3beae9
 
 COCOAPODS: 1.11.2

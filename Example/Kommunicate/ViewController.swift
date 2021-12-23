@@ -9,7 +9,7 @@
 #if os(iOS)
 import UIKit
 import Kommunicate
-//import Firebase
+import Firebase
 
 class ViewController: UIViewController {
 
@@ -32,7 +32,7 @@ class ViewController: UIViewController {
             print("Error fetching FCM registration token: \(error)")
           } else if let token = token {
             print("FCM registration token: \(token)")
-            self.fcmRegTokenMessage.text  = "Remote FCM registration token: \(token)"
+//            self.fcmRegTokenMessage.text  = "Remote FCM registration token: \(token)"
           }
         }
 

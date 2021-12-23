@@ -17,12 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var window: UIWindow?
 
     // Pass your App Id here. You can get the App Id from install section in the dashboard.
-    var appId = ""
+    var appId = "18ae6ce9d4f469f95c9c095fb5b0bda44"
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
       
         // Use Firebase library to configure APIs
-//        FirebaseApp.configure()
+        FirebaseApp.configure()
+        
+        
+        
+        Messaging.messaging().delegate = self
+
         
         setUpNavigationBarAppearance()
 
@@ -63,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
-
+  
     func applicationWillTerminate(_ application: UIApplication) {
         KMDbHandler.sharedInstance().saveContext()
     }
@@ -72,31 +77,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     {
 
         print("DEVICE_TOKEN_DATA :: \(deviceToken.description)")  // (SWIFT = 3) : TOKEN PARSING
+              var deviceTokenString: String = ""
+              for i in 0..<deviceToken.count
+              {
+                  deviceTokenString += String(format: "%02.2hhx", deviceToken[i] as CVarArg)
+              }
+              print("DEVICE_TOKEN_STRING :: \(deviceTokenString)")
 
-        var deviceTokenString: String = ""
-        for i in 0..<deviceToken.count
-        {
-            deviceTokenString += String(format: "%02.2hhx", deviceToken[i] as CVarArg)
-        }
-        print("DEVICE_TOKEN_STRING :: \(deviceTokenString)")
+              if (KMUserDefaultHandler.getApnDeviceToken() != deviceTokenString)
+              {
+                  let kmRegisterUserClientService: KMRegisterUserClientService = KMRegisterUserClientService()
+                  kmRegisterUserClientService.updateApnDeviceToken(withCompletion: deviceTokenString, withCompletion: { (response, error) in
+                      print ("REGISTRATION_RESPONSE :: \(String(describing: response))")
+                  })
+              }
+              Messaging.messaging().apnsToken = deviceToken;
 
-        if (KMUserDefaultHandler.getApnDeviceToken() != deviceTokenString)
-        {
-            let kmRegisterUserClientService: KMRegisterUserClientService = KMRegisterUserClientService()
-            kmRegisterUserClientService.updateApnDeviceToken(withCompletion: deviceTokenString, withCompletion: { (response, error) in
-                print ("REGISTRATION_RESPONSE :: \(String(describing: response))")
-            })
-        }
     }
 
+    
+    
+    
     func registerForNotification() {
-        UNUserNotificationCenter.current().requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in
+        
+        if #available(iOS 10.0, *) {
+          // For iOS 10 display notification (sent via APNS)
+          UNUserNotificationCenter.current().delegate = self
 
-            if granted {
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
+          let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+          UNUserNotificationCenter.current().requestAuthorization(
+            options: authOptions,
+            completionHandler: { _, _ in }
+          )
+        } else {
+          let settings: UIUserNotificationSettings =
+            UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+            UIApplication.shared.registerUserNotificationSettings(settings)
         }
     }
 
@@ -138,3 +154,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
 }
 #endif
+
+extension AppDelegate: MessagingDelegate {
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+           print("Firebase registration token: \(String(describing: fcmToken))")
+           
+           let dataDict: [String: String] = ["token": fcmToken ?? ""]
+           NotificationCenter.default.post(
+               name: Notification.Name("FCMToken"),
+               object: nil,
+               userInfo: dataDict
+           )
+       }
+       
+       func messaging(_ messaging: Messaging, appDidReceiveMessage message: NSDictionary) {
+           print(message)
+       }
+}
