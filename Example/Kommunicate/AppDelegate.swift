@@ -31,7 +31,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
         
         UNUserNotificationCenter.current().delegate = self
 
-        registerForNotification()
+        UNUserNotificationCenter.current().requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in
+
+            if granted {
+                print("APNS Registry is done")
+//
+            }
+            application.registerForRemoteNotifications()
+
+        }
+        
+    
         
         
         KMPushNotificationHandler.shared.dataConnectionNotificationHandlerWith(Kommunicate.defaultConfiguration, Kommunicate.kmConversationViewConfiguration)
@@ -87,6 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data)
     {
+        print("Sathyan didRegisterForRemoteNotificationsWithDeviceToken is called")  // (SWIFT = 3) : TOKEN PARSING
 
         print("DEVICE_TOKEN_DATA :: \(deviceToken.description)")  // (SWIFT = 3) : TOKEN PARSING
 
@@ -107,15 +118,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
     }
 
     func registerForNotification() {
-        UNUserNotificationCenter.current().requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in
-
-            if granted {
-                print("APNS Registry is done")
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
-        }
+       
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
