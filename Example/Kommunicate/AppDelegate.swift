@@ -13,7 +13,7 @@ import UserNotifications
 import Kommunicate
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserNotificationCenterDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
 
@@ -25,25 +25,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
         setUpNavigationBarAppearance()
 
         
-        FirebaseApp.configure()
+//        FirebaseApp.configure()
         
         Messaging.messaging().delegate = self
-        
-        UNUserNotificationCenter.current().delegate = self
+               
+       if #available(iOS 10.0, *) {
+           UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+               if let error = error {
+                   print("D'oh: \(error.localizedDescription)")
+               } else {
+                   DispatchQueue.main.async {
+                       application.registerForRemoteNotifications()
+                   }
+               }
+           }
+       }
+       if #available(iOS 10.0, *) {
+           UNUserNotificationCenter.current().delegate = self
+       }
+               
 
-        UNUserNotificationCenter.current().requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in
-
-            if granted {
-                print("APNS Registry is done")
-//
-            }
-            application.registerForRemoteNotifications()
-
-        }
-        
-    
-        
-        
         KMPushNotificationHandler.shared.dataConnectionNotificationHandlerWith(Kommunicate.defaultConfiguration, Kommunicate.kmConversationViewConfiguration)
         let kmApplocalNotificationHandler : KMAppLocalNotification =  KMAppLocalNotification.appLocalNotificationHandler()
         kmApplocalNotificationHandler.dataConnectionNotificationHandler()
@@ -61,17 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
         return true
     }
 
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        messaging.token { token, _ in
-            guard let token = token else{
-                print("Failed to get token")
-                return
-            }
-            print("FCM Token : \(token)")
-            
-        }
-    }
-    
+   
     
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -80,11 +71,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
 
     func applicationDidEnterBackground(_ application: UIApplication) {
         print("APP_ENTER_IN_BACKGROUND")
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "APP_ENTER_IN_BACKGROUND"), object: nil)
+
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        print("APP_ENTER_IN_FOREGROUND")
-        UIApplication.shared.applicationIconBadgeNumber = 0
+        KMPushNotificationService.applicationEntersForeground()
+                print("APP_ENTER_IN_FOREGROUND")
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "APP_ENTER_IN_FOREGROUND"), object: nil)
+                UIApplication.shared.applicationIconBadgeNumber = 0
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -95,51 +90,85 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
         KMDbHandler.sharedInstance().saveContext()
     }
 
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data)
-    {
-        print("Sathyan didRegisterForRemoteNotificationsWithDeviceToken is called")  // (SWIFT = 3) : TOKEN PARSING
+     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+           
+           print("DEVICE_TOKEN_DATA :: \(deviceToken.description)")  // (SWIFT = 3) : TOKEN PARSING
+           var deviceTokenString: String = ""
+           for i in 0..<deviceToken.count
+           {
+               deviceTokenString += String(format: "%02.2hhx", deviceToken[i] as CVarArg)
+           }
+           print("DEVICE_TOKEN_STRING :: \(deviceTokenString)")
 
-        print("DEVICE_TOKEN_DATA :: \(deviceToken.description)")  // (SWIFT = 3) : TOKEN PARSING
-
-        var deviceTokenString: String = ""
-        for i in 0..<deviceToken.count
-        {
-            deviceTokenString += String(format: "%02.2hhx", deviceToken[i] as CVarArg)
-        }
-        print("DEVICE_TOKEN_STRING :: \(deviceTokenString)")
-
-        if (KMUserDefaultHandler.getApnDeviceToken() != deviceTokenString)
-        {
-            let kmRegisterUserClientService: KMRegisterUserClientService = KMRegisterUserClientService()
-            kmRegisterUserClientService.updateApnDeviceToken(withCompletion: deviceTokenString, withCompletion: { (response, error) in
-                print ("REGISTRATION_RESPONSE :: \(String(describing: response))")
-            })
-        }
+           if (KMUserDefaultHandler.getApnDeviceToken() != deviceTokenString)
+           {
+               let kmRegisterUserClientService: KMRegisterUserClientService = KMRegisterUserClientService()
+               kmRegisterUserClientService.updateApnDeviceToken(withCompletion: deviceTokenString, withCompletion: { (response, error) in
+                   print ("REGISTRATION_RESPONSE :: \(String(describing: response))")
+               })
+           }
+           Messaging.messaging().apnsToken = deviceToken;
+    }
+    
+     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+            print("Failed to register for notifications: \(error.localizedDescription)")
     }
 
-//    func registerForNotification() {
-//       
-//    }
+    @available(iOS 10.0, *)
+       func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+          
+          let userInfo = notification.request.content.userInfo
+          print(userInfo)
+          
+          let service = KMPushNotificationService()
+          let dict = notification.request.content.userInfo
+          
+          if service.isKommunicateNotification(dict) {
+              service.processPushNotification(dict, appState: UIApplication.shared.applicationState)
+              completionHandler([])
+              return
+          } else {
+              Messaging.messaging().appDidReceiveMessage(userInfo)
+          }
+          completionHandler([.sound, .badge, .alert])
+      }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let service = KMPushNotificationService()
-        let dict = notification.request.content.userInfo
-        guard !service.isKommunicateNotification(dict) else {
-            service.processPushNotification(dict, appState: UIApplication.shared.applicationState)
-            completionHandler([])
-            return
+    @available(iOS 10.0, *)
+        func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                            didReceive response: UNNotificationResponse,
+                                            withCompletionHandler completionHandler: @escaping () -> Void) {
+           let userInfo = response.notification.request.content.userInfo
+           print(userInfo)
+           let service = KMPushNotificationService()
+           let dict = response.notification.request.content.userInfo
+           if service.isApplozicNotification(dict) {
+               service.processPushNotification(dict, appState: UIApplication.shared.applicationState)
+           } else {
+               Messaging.messaging().appDidReceiveMessage(userInfo)
+           }
+           completionHandler()
+       }
+    
+     func application(_ application: UIApplication,
+                                  didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                                  fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult)
+                                    -> Void) {
+            
+            if let messageID = userInfo["gcmMessageIDKey"] {
+                print("Message ID: \(messageID)")
+            }
+            print(userInfo)
+            
+            let service = KMPushNotificationService()
+            if service.isApplozicNotification(userInfo) {
+                service.processPushNotification(userInfo, appState: UIApplication.shared.applicationState)
+            } else {
+                Messaging.messaging().appDidReceiveMessage(userInfo)
+            }
+            completionHandler(UIBackgroundFetchResult.newData)
         }
-        completionHandler([.sound, .badge, .alert])
-    }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let service = KMPushNotificationService()
-        let dict = response.notification.request.content.userInfo
-        if service.isApplozicNotification(dict) {
-            service.processPushNotification(dict, appState: UIApplication.shared.applicationState)
-        }
-        completionHandler()
-    }
+    
+    
 
     func setUpNavigationBarAppearance() {
 
@@ -156,6 +185,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate,UNUserN
         navigationBarProxy.tintColor = UIColor.navigationOceanBlue()
         kmNavigationBarProxy.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
     }
+    
 
+}
+
+extension AppDelegate: MessagingDelegate {
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        print("Firebase registration token: \(String(describing: fcmToken))")
+        
+        let dataDict: [String: String] = ["token": fcmToken ?? ""]
+        NotificationCenter.default.post(
+            name: Notification.Name("FCMToken"),
+            object: nil,
+            userInfo: dataDict
+        )
+    }
+    
+    func messaging(_ messaging: Messaging, appDidReceiveMessage message: NSDictionary) {
+        print(message)
+    }
 }
 #endif
