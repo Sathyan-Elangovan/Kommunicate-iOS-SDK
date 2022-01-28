@@ -18,14 +18,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var window: UIWindow?
 
     // Pass your App Id here. You can get the App Id from install section in the dashboard.
-    var appId = ""
+    var appId = "715a0d93da03fad14274464cc4f76834"
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         setUpNavigationBarAppearance()
 
         
-//        FirebaseApp.configure()
+        FirebaseApp.configure()
         
         Messaging.messaging().delegate = self
                
@@ -190,9 +190,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
 }
 
 extension AppDelegate: MessagingDelegate {
+  
+    
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+       
         print("Firebase registration token: \(String(describing: fcmToken))")
+       
+        let kmRegisterUserClientService: KMRegisterUserClientService = KMRegisterUserClientService()
+        kmRegisterUserClientService.updateApnDeviceToken(withCompletion: fcmToken, withCompletion: { (response, error) in
+            print ("REGISTRATION_RESPONSE :: \(String(describing: response))")
+        })
         
         let dataDict: [String: String] = ["token": fcmToken ?? ""]
         NotificationCenter.default.post(
@@ -205,5 +213,7 @@ extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, appDidReceiveMessage message: NSDictionary) {
         print(message)
     }
+    
+   
 }
 #endif

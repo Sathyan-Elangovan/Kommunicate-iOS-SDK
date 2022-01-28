@@ -9,7 +9,7 @@ import Foundation
 
 struct API {
     enum Backend: String {
-        case chat = "https://chat.kommunicate.io"
+        case chat = "https://chat-test.kommunicate.io"
         var url: URL {
             return URL(string: self.rawValue)!
         }
