@@ -15,7 +15,7 @@
         "repositoryURL": "https://github.com/Sathyan-Elangovan/KommunicateChatUI-iOS-SDK.git",
         "state": {
           "branch": null,
-          "revision": "a6dcddd3c5b718ec20cb2c0794bbde5c0d4d0810",
+          "revision": "cb7ca39d69d9c7c045a3a784905819092d9ad4ab",
           "version": null
         }
       },
@@ -24,7 +24,7 @@
         "repositoryURL": "https://github.com/Sathyan-Elangovan/KommunicateCore-iOS-SDK.git",
         "state": {
           "branch": null,
-          "revision": "f371595fd9824d4d9f0c60d792d115ce2a714428",
+          "revision": "03405d5f6e45882fd674ce8f0834dd5cd01af46b",
           "version": null
         }
       },
