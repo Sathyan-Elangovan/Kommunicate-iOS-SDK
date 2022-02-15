@@ -13,12 +13,12 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(name: "ApplozicSwift", url: "https://github.com/AppLozic/ApplozicSwift.git", from: "6.0.0"),
+        .package(name: "KommunicateChatUI-iOS-SDK", url: "https://github.com/Sathyan-Elangovan/KommunicateChatUI-iOS-SDK.git", .revision("21d5ad012f111864b200181ad1a6f331bd36c059")),
     ],
     targets: [
         .target(
             name: "Kommunicate",
-            dependencies: [.product(name: "ApplozicSwift", package: "ApplozicSwift")],
+            dependencies: [.product(name: "KommunicateChatUI-iOS-SDK", package: "KommunicateChatUI-iOS-SDK")],
             path: "Sources",
             resources: [.process("Resources")]
         ),
