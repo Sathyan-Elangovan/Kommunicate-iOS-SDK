@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import KommunicateCore_iOS_SDK
+import KommunicateCoreiOSSDK
 
 public class KMMessage: NSObject {
     public var conversationId: String = ""

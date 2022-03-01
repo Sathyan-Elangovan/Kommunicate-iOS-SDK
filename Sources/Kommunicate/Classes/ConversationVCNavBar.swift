@@ -8,7 +8,7 @@
 import Foundation
 import Kingfisher
 import KommunicateChatUI_iOS_SDK
-import KommunicateCore_iOS_SDK
+import KommunicateCoreiOSSDK
 
 protocol NavigationBarCallbacks: AnyObject {
     func backButtonPressed()

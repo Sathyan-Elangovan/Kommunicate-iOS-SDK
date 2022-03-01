@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import KommunicateCore_iOS_SDK
+import KommunicateCoreiOSSDK
 
 final class URLBuilder {
     private var components = URLComponents()

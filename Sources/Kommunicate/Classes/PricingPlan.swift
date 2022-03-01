@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import KommunicateCore_iOS_SDK
+import KommunicateCoreiOSSDK
 
 struct PricingPlan {
     static let shared = PricingPlan()
