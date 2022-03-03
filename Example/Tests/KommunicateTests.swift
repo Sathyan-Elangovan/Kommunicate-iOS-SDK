@@ -1,4 +1,4 @@
-import KommunicateCoreiOSSDK
+import KommunicateCore_iOS_SDK
 import UIKit
 import XCTest
 @testable import Kommunicate

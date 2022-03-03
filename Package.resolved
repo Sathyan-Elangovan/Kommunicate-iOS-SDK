@@ -12,19 +12,19 @@
       },
       {
         "package": "KommunicateChatUI-iOS-SDK",
-        "repositoryURL": "https://github.com/Kommunicate-io/KommunicateChatUI-iOS-SDK.git",
+        "repositoryURL": "https://github.com/Sathyan-Elangovan/KommunicateChatUI-iOS-SDK.git",
         "state": {
           "branch": null,
-          "revision": "2ff0dbda5f415efb988d34d8bf9cb1a937d697e9",
+          "revision": "f12a25339efef49fd3e6d5efb944dd1d25650705",
           "version": null
         }
       },
       {
-        "package": "KommunicateCoreiOSSDK",
+        "package": "KommunicateCore_iOS_SDK",
         "repositoryURL": "https://github.com/Sathyan-Elangovan/KommunicateCore-iOS-SDK.git",
         "state": {
           "branch": null,
-          "revision": "a8e5784893bcf37123db38e797a5a3efd52a9c9c",
+          "revision": "fdaca8c16f47a56972710bd9d37ccf13c0266991",
           "version": null
         }
       },

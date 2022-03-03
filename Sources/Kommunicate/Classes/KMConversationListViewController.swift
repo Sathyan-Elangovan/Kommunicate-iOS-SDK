@@ -7,7 +7,7 @@
 
 import Foundation
 import KommunicateChatUI_iOS_SDK
-import KommunicateCoreiOSSDK
+import KommunicateCore_iOS_SDK
 
 public class KMConversationListViewController: ALKBaseViewController, Localizable {
     enum LocalizedText {
