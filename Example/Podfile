@@ -8,6 +8,8 @@ target 'Kommunicate_Example' do
   pod 'Kommunicate', :path => '../'
   target 'Kommunicate_Tests' do
     inherit! :search_paths
+    pod 'KommunicateChatUI-iOS-SDK', :git => 'https://github.com/Sathyan-Elangovan/KommunicateChatUI-iOS-SDK.git', :branch => 'new_spm'	
+    pod 'KommunicateCore-iOS-SDK', :git => 'https://github.com/Kommunicate-io/KommunicateCore-iOS-SDK.git', :branch => 'master'	
     pod 'FBSnapshotTestCase' , '~> 2.1.4'
     pod 'Nimble'
     pod 'Quick'

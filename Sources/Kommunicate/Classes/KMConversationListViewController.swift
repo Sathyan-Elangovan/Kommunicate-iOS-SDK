@@ -591,6 +591,9 @@ extension KMConversationListViewController: ALMQTTConversationDelegate {
         }
         print("MQTT did connected")
     }
+    public func userOnlineStatusChanged(_ contactId: String!, status: String!) {
+        print("sa")
+    }
 
     open func updateUserDetail(_ userId: String!) {
         guard let userId = userId else { return }
