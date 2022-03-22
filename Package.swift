@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Kommunicate",
     defaultLocalization: "en",
-    platforms: [.iOS(.v10)],
+    platforms: [.iOS(.v12)],
     products: [
         .library(
             name: "Kommunicate",
@@ -13,14 +13,15 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(name: "ApplozicSwift", url: "https://github.com/AppLozic/ApplozicSwift.git", from: "6.0.0"),
-    ],
+           .package(name: "KommunicateChatUI-iOS-SDK", url: "https://github.com/Sathyan-Elangovan/KommunicateChatUI-iOS-SDK.git", .revision("98dc3c68050404fe9527bb656a09d8473994332d")),
+       ],
     targets: [
         .target(
             name: "Kommunicate",
-            dependencies: [.product(name: "ApplozicSwift", package: "ApplozicSwift")],
+            dependencies: [.product(name: "KommunicateChatUI-iOS-SDK", package: "KommunicateChatUI-iOS-SDK")],
             path: "Sources",
             resources: [.process("Resources")]
         ),
     ]
 )
+//98dc3c68050404fe9527bb656a09d8473994332d
