@@ -149,6 +149,7 @@
         ) -> KMUser {
             let kmUser = KMUser()
             kmUser.userId = userId
+//            kmUser.displayName = "sathya"
             kmUser.applicationId = applicationId
             return kmUser
         }
